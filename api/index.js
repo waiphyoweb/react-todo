@@ -16,7 +16,7 @@ app.use(bodyParser.json());
 app.post("/tasks", async (req, res) => {
     const { subject } = req.body;
 
-    if(!subject) return res.json({ msg: "Subject is required!" });
+    if(!subject) return res.status(400).json({ msg: "Subject is required!" });
 
     const result = await db.collection("tasks").insertOne({
         subject,
@@ -44,7 +44,55 @@ app.get("/tasks/:id", async (req, res) => {
     });
 
     res.json(task);
-})
+});
+
+app.put("/tasks/:id", async (req, res) => {
+    const { id } = req.params;
+    const { subject } = req.body;
+
+    if(!subject) return res.status(400).json({ msg: "Subject is required!" });
+
+    const result = await db.collection("tasks").updateOne(
+        { _id: new ObjectId(id) },
+        { $set: { subject: subject } },
+    );
+
+    res.json(result);
+});
+
+app.delete("/tasks/:id", async (req, res) => {
+    const { id } = req.params;
+
+    const result = await db.collection("tasks").deleteOne({
+        _id: new ObjectId(id),
+    });
+
+    res.status(204).json(result);
+});
+
+app.delete("/tasks", async (req, res) => {
+    const result = await db.collection("tasks").deleteMany();
+
+    res.status(204).json(result);
+});
+
+app.put("/tasks/:id/toggle", async (req, res) => {
+    const { id } = req.params;
+
+    const result = await db.collection("tasks").find({
+        _id: new ObjectId(id),
+    }).toArray();
+
+    const done = result[0].done;
+
+    const task = await db.collection("tasks").updateOne(
+        { _id: new ObjectId(id) },
+        { $set: { done: !done } },
+    );
+
+    res.status(204).json(task);
+});
+
 app.listen(8000, () => {
     console.log("Server is running on port 8000.");
 });
