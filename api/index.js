@@ -4,13 +4,14 @@ const app = express();
 const cors = require("cors");
 app.use(cors());
 
+const { MongoClient, ObjectId } = require("mongodb");
+const mongo = new MongoClient("mongodb://localhost");
+const db = mongo.db("todo-app");
+
 const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
-const { MongoClient, ObjectId } = require("mongodb");
-const mongo = new MongoClient("mongodb://localhost");
-const db = mongo.db("todo-app");
 
 app.post("/tasks", async (req, res) => {
     const { subject } = req.body;
@@ -23,7 +24,7 @@ app.post("/tasks", async (req, res) => {
     });
 
     const task = await db.collection("tasks").findOne({
-        _id: ObjectId(result.insertedId),
+        _id: new ObjectId(result.insertedId),
     });
 
     res.status(201).json(task);
@@ -35,6 +36,15 @@ app.get("/tasks", async (req, res) => {
     res.json(tasks);
 });
 
+app.get("/tasks/:id", async (req, res) => {
+    const { id } = req.params;
+
+    const task = await db.collection("tasks").findOne({
+        _id: new ObjectId(id),
+    });
+
+    res.json(task);
+})
 app.listen(8000, () => {
     console.log("Server is running on port 8000.");
 });
