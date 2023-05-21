@@ -71,7 +71,7 @@ app.delete("/tasks/:id", async (req, res) => {
 });
 
 app.delete("/tasks", async (req, res) => {
-    const result = await db.collection("tasks").deleteMany();
+    const result = await db.collection("tasks").deleteMany({ done: true });
 
     res.status(204).json(result);
 });
