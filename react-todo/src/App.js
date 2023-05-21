@@ -5,6 +5,7 @@ import {Routes, Route} from 'react-router-dom';
 
 import Title from "./Title"
 import Tasks from "./Tasks";
+import NewTask from "./NewTask";
 
 const api = "http://localhost:8000";
 
@@ -17,13 +18,28 @@ export default function App() {
       const tasks = await res.json();
 
       setItems(tasks);
-      console.log("Data fetch successfully!");
     })();
   },[]);
 
+  const add = subject => {
+    (async () => {
+      const res = await fetch(`${api}/tasks`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ subject }),
+      })
+
+      const task = await res.json();
+
+      setItems([task, ...items]);
+    })();
+  }
+
   return (
     <Box>
-      <AppBar position="static" sx={{ bgcolor: indigo[500] }}>
+      <AppBar position="static" sx={{ bgcolor: indigo[500], mb: 3 }}>
         <Toolbar>
             <Title />
         </Toolbar>
@@ -32,7 +48,8 @@ export default function App() {
         <Route 
           path="/"
           element={
-            <Box>
+            <Box sx={{ mx: {lg: "200px", md: "100px", sm: "50px"}}}>
+              <NewTask add={add} />
               <Tasks items={items} />
             </Box>
           }
