@@ -21,8 +21,8 @@ export default function Edit({ update }) {
         })();
     }, []);
     return (
-        <Box>
-            <Box>
+        <Box sx={{ mx: {lg: "200px", md: "100px", sm: "50px"} }}>
+            <Box sx={{ mb: 3 }}>
                 <IconButton
                     onClick={() => {
                         navigate("/");
@@ -41,6 +41,7 @@ export default function Edit({ update }) {
                     update(id, subject);
                     navigate("/");
                 }}
+                
             >
                 <OutlinedInput
                     value={subject}
